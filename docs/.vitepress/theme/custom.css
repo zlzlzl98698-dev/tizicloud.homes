@@ -1,0 +1,332 @@
+:root {
+  --vp-c-brand-1: #1d4ed8;
+  --vp-c-brand-2: #2563eb;
+  --vp-c-brand-3: #3b82f6;
+  --vp-c-brand-soft: #eff6ff;
+
+  --tz-navy-dark: #0a1128;
+  --tz-navy-surface: #101f42;
+  --tz-navy-border: #1e3a8a;
+  --tz-accent-blue: #38bdf8;
+  --tz-accent-green: #10b981;
+  --tz-accent-amber: #f59e0b;
+  --tz-accent-red: #ef4444;
+
+  --tz-text-main: #0f172a;
+  --tz-text-muted: #64748b;
+  --tz-card-bg: #ffffff;
+  --tz-card-border: #e2e8f0;
+  --tz-card-hover: #f8fafc;
+}
+
+/* Base resets & typography */
+.VPNavBarTitle .logo {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #3b82f6;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  color: var(--tz-text-main);
+  background-color: #ffffff;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Hero Layout */
+.tz-hero {
+  padding: 4rem 1.5rem 3rem;
+  text-align: center;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.tz-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 1px solid #bfdbfe;
+  margin-bottom: 1.5rem;
+}
+
+.tz-hero-title {
+  font-size: 2.75rem;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #0f172a;
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.025em;
+}
+
+.tz-hero-desc {
+  font-size: 1.25rem;
+  color: #475569;
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  line-height: 1.6;
+}
+
+.tz-hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+
+.tz-btn-primary {
+  background: #1d4ed8;
+  color: #ffffff !important;
+  padding: 0.75rem 1.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
+}
+.tz-btn-primary:hover {
+  background: #1e40af;
+  transform: translateY(-1px);
+}
+
+.tz-btn-secondary {
+  background: #f1f5f9;
+  color: #0f172a !important;
+  padding: 0.75rem 1.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none !important;
+  border: 1px solid #cbd5e1;
+  transition: all 0.2s ease;
+}
+.tz-btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+/* Feature grid */
+.tz-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.tz-feature-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+  text-decoration: none !important;
+  display: block;
+  color: inherit !important;
+}
+.tz-feature-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+  transform: translateY(-2px);
+}
+
+.tz-card-icon {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.tz-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+}
+
+.tz-card-desc {
+  font-size: 0.9rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+/* Dark Network Observatory Component Styles */
+.tz-observatory-panel {
+  background: #090e1a;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 1.5rem;
+  color: #e2e8f0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  margin: 2rem 0;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.tz-observatory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tz-observatory-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #38bdf8;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.tz-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.tz-status-measured {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.tz-status-vendor {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+.tz-status-historical {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.tz-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+}
+
+/* Metric Bars */
+.tz-metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+}
+.tz-metric-bar-bg {
+  flex: 1;
+  height: 8px;
+  background: #1e293b;
+  border-radius: 4px;
+  margin: 0 1rem;
+  overflow: hidden;
+}
+.tz-metric-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #2563eb, #38bdf8);
+}
+
+/* Disclaimer pill */
+.tz-disclaimer-box {
+  background: #f8fafc;
+  border-left: 4px solid #3b82f6;
+  padding: 1rem 1.25rem;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.875rem;
+  color: #475569;
+  margin: 1.5rem 0;
+}
+
+/* CTA Card */
+.tz-cta-card {
+  background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+.tz-cta-text h4 {
+  margin: 0 0 0.25rem;
+  font-size: 1.2rem;
+  color: #1e3a8a;
+}
+.tz-cta-text p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #475569;
+}
+.tz-cta-btn {
+  background: #2563eb;
+  color: #ffffff !important;
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transition: all 0.2s;
+}
+.tz-cta-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* Responsive tables */
+.tz-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+.tz-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  text-align: left;
+}
+.tz-data-table th {
+  background: #f8fafc;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  border-bottom: 1px solid #e2e8f0;
+}
+.tz-data-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+}
+.tz-data-table tr:hover td {
+  background: #f8fafc;
+}
+
+@media (max-width: 768px) {
+  .tz-hero-title {
+    font-size: 2rem;
+  }
+  .tz-cta-card {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+}

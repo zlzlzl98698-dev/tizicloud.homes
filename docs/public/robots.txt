@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Google 搜索爬虫
+User-agent: Googlebot
+Allow: /
+
+# 必应搜索爬虫
+User-agent: bingbot
+Allow: /
+
+# 百度搜索爬虫
+User-agent: Baiduspider
+Allow: /
+
+# 神马搜索 / UC / 夸克搜索爬虫
+User-agent: yisouspider
+Allow: /
+
+# 站点地图索引声明
+Sitemap: https://tizicloud.homes/sitemap.xml

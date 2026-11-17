@@ -1,0 +1,418 @@
+const fs = require("fs");
+const path = require("path");
+
+const brands = JSON.parse(fs.readFileSync("data/brands.json", "utf-8"));
+
+// Navigation structure: 4 primary, 28 secondary, 56 tertiary clusters
+const navigation = [
+  {
+    id: "airport",
+    name: "机场推荐",
+    url: "/airport/",
+    description: "专业机场评测与选购指南，涵盖综合推荐、晚高峰排行、性价比测算、专线稳定、便宜入门及科学上网基础知识。",
+    secondary: [
+      {
+        id: "recommend",
+        name: "机场推荐",
+        url: "/airport/recommend/",
+        description: "2026 年度主力与备用机场综合推荐，结合实测数据与线路特点，提供全场景选购建议。",
+        clusters: [
+          { id: "selection", name: "综合评测与主力选购", url: "/airport/recommend/selection/", kw: "机场推荐, 2026机场推荐, 主力机场选择" },
+          { id: "scenarios", name: "设备与使用场景匹配", url: "/airport/recommend/scenarios/", kw: "办公机场推荐, 追剧机场, 多设备机场推荐" }
+        ]
+      },
+      {
+        id: "ranking",
+        name: "机场排行",
+        url: "/airport/ranking/",
+        description: "基于真实节点测速、丢包率、晚高峰吞吐与长期稳定性的机场排行榜单。",
+        clusters: [
+          { id: "speed", name: "晚高峰测速排行榜", url: "/airport/ranking/speed/", kw: "机场排行, 机场测速排行, 晚高峰不卡机场" },
+          { id: "reputation", name: "综合口碑与抗封锁榜", url: "/airport/ranking/reputation/", kw: "稳定机场排行, 机场口碑榜, 专线抗封锁排行" }
+        ]
+      },
+      {
+        id: "cost-effective",
+        name: "性价比机场",
+        url: "/airport/cost-effective/",
+        description: "量化每 GB 流量单价与网络质量，挖掘兼具速度与价格优势的良心高性价比机场。",
+        clusters: [
+          { id: "traffic-value", name: "每GB成本与流量套餐分析", url: "/airport/cost-effective/traffic-value/", kw: "性价比机场, 便宜好用机场, 大流量机场推荐" },
+          { id: "annual-budget", name: "百元内年付优质方案", url: "/airport/cost-effective/annual-budget/", kw: "百元年付机场, 100元年付梯子, 平价专线推荐" }
+        ]
+      },
+      {
+        id: "stable",
+        name: "稳定机场",
+        url: "/airport/stable/",
+        description: "聚焦企业级 IEPL/IPLC 内网专线与 BGP 智能调度，主打全天候低延迟零丢包。",
+        clusters: [
+          { id: "iplc-iepl", name: "IEPL/IPLC 专线稳定性实测", url: "/airport/stable/iplc-iepl/", kw: "稳定机场, IPLC专线机场, IEPL专线推荐" },
+          { id: "anti-blocking", name: "敏感时期与晚高峰抗封锁指南", url: "/airport/stable/anti-blocking/", kw: "抗封锁机场, 晚高峰稳定梯子, 跨境企业网络" }
+        ]
+      },
+      {
+        id: "cheap",
+        name: "便宜机场",
+        url: "/airport/cheap/",
+        description: "10元以下月付低门槛机场精选，适合学生党、轻量浏览与备用翻墙需求。",
+        clusters: [
+          { id: "under-10", name: "10元以下月付平价机场实测", url: "/airport/cheap/under-10/", kw: "便宜机场, 10元机场, 5元机场推荐" },
+          { id: "pitfalls", name: "低价机场避坑与备用策略", url: "/airport/cheap/pitfalls/", kw: "平价机场避坑, 便宜梯子风险, 备用机场方案" }
+        ]
+      },
+      {
+        id: "free",
+        name: "免费梯子",
+        url: "/airport/free/",
+        description: "免费试用、签到送流量与公开节点资源安全核验，揭示免费背后的隐私风险与防护。",
+        clusters: [
+          { id: "trials", name: "免费试用与签到机场核验", url: "/airport/free/trials/", kw: "免费梯子, 免费机场, 机场试用教程" },
+          { id: "security", name: "免费节点安全隐患与隐私防护", url: "/airport/free/security/", kw: "免费梯子安全吗, 免费节点风险, 隐私翻墙指南" }
+        ]
+      },
+      {
+        id: "guide",
+        name: "科学上网",
+        url: "/airport/guide/",
+        description: "零基础翻墙科普、专线与公网区别、现代加密协议演进与全平台通识指引。",
+        clusters: [
+          { id: "basics", name: "科学上网新手基础与术语入门", url: "/airport/guide/basics/", kw: "科学上网, 科学上网教程, 翻墙新手入门" },
+          { id: "protocols", name: "翻墙原理与协议线路全景解析", url: "/airport/guide/protocols/", kw: "翻墙原理, Shadowsocks与VLESS区别, 机场线路解析" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "vpn",
+    name: "VPN 与加速器",
+    url: "/vpn/",
+    description: "全球商业 VPN 与网络加速器专业横评，深入分析传统 VPN 与现代机场在协议、速度与防封锁上的核心差异。",
+    secondary: [
+      {
+        id: "recommend",
+        name: "VPN 推荐",
+        url: "/vpn/recommend/",
+        description: "国内外主流 VPN 综合推荐与选购对比，帮助用户理清不同网络协议与服务商特长。",
+        clusters: [
+          { id: "global-vpn", name: "全球主流商业 VPN 深度对比", url: "/vpn/recommend/global-vpn/", kw: "VPN推荐, 2026好用的VPN, 国外VPN评测" },
+          { id: "airport-vs-vpn", name: "机场与传统 VPN 差异全维度对比", url: "/vpn/recommend/airport-vs-vpn/", kw: "VPN和机场区别, 机场和VPN哪个好, 代理与VPN对比" }
+        ]
+      },
+      {
+        id: "free",
+        name: "免费 VPN",
+        url: "/vpn/free/",
+        description: "公开免费 VPN 额度实测、连接稳定性与潜在数据广告贩售风险深度披露。",
+        clusters: [
+          { id: "tested", name: "知名免费 VPN 额度与限速实测", url: "/vpn/free/tested/", kw: "免费VPN, 永久免费VPN, 电脑免费VPN" },
+          { id: "privacy", name: "免费 VPN 广告与隐私数据风险深度调查", url: "/vpn/free/privacy/", kw: "免费VPN安全吗, VPN隐私泄露, 恶意VPN排查" }
+        ]
+      },
+      {
+        id: "mobile",
+        name: "手机 VPN",
+        url: "/vpn/mobile/",
+        description: "iPhone、iPad 与 Android 手机平台代理工具配置、后台保活与海外账号获取全攻略。",
+        clusters: [
+          { id: "ios", name: "iOS 苹果手机翻墙与美区账号教程", url: "/vpn/mobile/ios/", kw: "手机VPN, 苹果手机VPN, iOS小火箭配置" },
+          { id: "android", name: "Android 安卓系统代理与后台保活指南", url: "/vpn/mobile/android/", kw: "安卓手机VPN, v2rayNG使用教程, 安卓翻墙软件" }
+        ]
+      },
+      {
+        id: "reviews",
+        name: "VPN 软件评测",
+        url: "/vpn/reviews/",
+        description: "多款知名代理与加速软件安全审计、协议穿透测试与无日志承诺验证。",
+        clusters: [
+          { id: "security", name: "客户端功能与加密技术安全审计", url: "/vpn/reviews/security/", kw: "VPN软件评测, 加密代理评测, 安全翻墙软件" },
+          { id: "protocols", name: "协议穿透力与 WireGuard/VLESS 实测", url: "/vpn/reviews/protocols/", kw: "WireGuard评测, VLESS穿透能力, 翻墙协议对比" }
+        ]
+      },
+      {
+        id: "accelerator",
+        name: "VPN 加速器",
+        url: "/vpn/accelerator/",
+        description: "跨境电商、海外社交媒体运营、远程协作与学术资料检索专用加速网络方案。",
+        clusters: [
+          { id: "ecommerce", name: "跨境外贸与跨境电商加速方案", url: "/vpn/accelerator/ecommerce/", kw: "VPN加速器, 外贸加速器, 跨境电商梯子" },
+          { id: "gaming", name: "国际游戏低延迟与网络回国双向加速", url: "/vpn/accelerator/gaming/", kw: "游戏加速器推荐, 国际服加速器, 海外回国加速器" }
+        ]
+      },
+      {
+        id: "comparison",
+        name: "加速器对比",
+        url: "/vpn/comparison/",
+        description: "网络加速器与传统机场专线在底层技术、路由走向、费用及体验上的横向对照。",
+        clusters: [
+          { id: "game-vs-airport", name: "游戏加速器 vs 网络机场线路差异", url: "/vpn/comparison/game-vs-airport/", kw: "加速器对比, 游戏加速器和梯子区别, 专线加速对比" },
+          { id: "matrix", name: "国内外主流加速器综合性能横评", url: "/vpn/comparison/matrix/", kw: "加速器哪个好, 电脑加速器排行, 2026加速器综合对比" }
+        ]
+      },
+      {
+        id: "best",
+        name: "好用的 VPN",
+        url: "/vpn/best/",
+        description: "年度精选高可靠性网络代理工具，按个人、团队、媒体及学术需求细分选型。",
+        clusters: [
+          { id: "annual-picks", name: "2026 年度最具使用价值代理工具榜单", url: "/vpn/best/annual-picks/", kw: "好用的VPN, 2026最好用的梯子, 稳定好用翻墙工具" },
+          { id: "scenarios", name: "办公/学术/娱乐不同场景最佳选型", url: "/vpn/best/scenarios/", kw: "学术翻墙推荐, 追剧最好用的VPN, 团队办公翻墙方案" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "clash",
+    name: "Clash 客户端",
+    url: "/clash/",
+    description: "Clash 系列客户端知识库，包含 Clash Verge Rev、Mihomo 内核、官方安全下载、订阅导入与全套故障排查。",
+    secondary: [
+      {
+        id: "recommend",
+        name: "Clash 推荐",
+        url: "/clash/recommend/",
+        description: "2026 年主流 Clash 客户端衍生版本横评，挑选最适合自己操作系统的 GUI 工具。",
+        clusters: [
+          { id: "variants", name: "2026 全平台主流 Clash 分支选型对比", url: "/clash/recommend/variants/", kw: "Clash推荐, Clash客户端哪个好, Clash Verge Rev评测" },
+          { id: "mihomo", name: "Mihomo (Clash.Meta) 新内核生态全景", url: "/clash/recommend/mihomo/", kw: "Clash Meta内核, Mihomo客户端推荐, 新版Clash特性" }
+        ]
+      },
+      {
+        id: "verge",
+        name: "Clash Verge",
+        url: "/clash/verge/",
+        description: "Clash Verge Rev 核心功能架构、Mihomo 内核深度整合与现代化交互特性全面解读。",
+        clusters: [
+          { id: "features", name: "Clash Verge Rev 核心功能与界面详解", url: "/clash/verge/features/", kw: "Clash Verge, Clash Verge Rev教程, Clash Verge使用指南" },
+          { id: "advanced", name: "增强扩展与高级设置进阶指南", url: "/clash/verge/advanced/", kw: "Clash Verge扩展配置, Merge规则覆写, 脚本增强教程" }
+        ]
+      },
+      {
+        id: "verge-download",
+        name: "Clash Verge 下载",
+        url: "/clash/verge-download/",
+        description: "官方 GitHub 开源仓库安全下载入口，提供 Windows/macOS/Linux 安装包架构辨析与防钓鱼提示。",
+        clusters: [
+          { id: "official", name: "Windows/macOS/Linux 官方安全下载校验", url: "/clash/verge-download/official/", kw: "Clash Verge下载, Clash Verge Rev官方下载, 电脑版Clash下载" },
+          { id: "changelog", name: "版本升级日志与迁移安装指南", url: "/clash/verge-download/changelog/", kw: "Clash Verge版本更新, Clash升级教程, 安装包架构区别" }
+        ]
+      },
+      {
+        id: "verge-subscription",
+        name: "Clash Verge 订阅",
+        url: "/clash/verge-subscription/",
+        description: "机场订阅链接一键导入、自动定时更新、策略组切换与备用订阅冗余配置。",
+        clusters: [
+          { id: "import", name: "一键导入订阅与手动链接配置教程", url: "/clash/verge-subscription/import/", kw: "Clash Verge订阅, Clash订阅导入教程, 机场订阅转换" },
+          { id: "auto-update", name: "订阅自动更新与故障备份策略", url: "/clash/verge-subscription/auto-update/", kw: "Clash订阅更新失败, 定时更新配置, 多订阅备份方案" }
+        ]
+      },
+      {
+        id: "meta",
+        name: "Clash Meta",
+        url: "/clash/meta/",
+        description: "Mihomo (Clash.Meta) 核心技术参数、新协议语法、高级分流规则集与实操示范。",
+        clusters: [
+          { id: "features", name: "Meta 内核特性与新协议语法支持", url: "/clash/meta/features/", kw: "Clash Meta, Mihomo内核配置, VLESS与Hysteria支持" },
+          { id: "rulesets", name: "Rule-Set 规则集与 Sub-Rules 进阶实操", url: "/clash/meta/rulesets/", kw: "Clash分流规则, Rule-Set规则集配置, 广告拦截规则" }
+        ]
+      },
+      {
+        id: "tutorial",
+        name: "Clash 使用教程",
+        url: "/clash/tutorial/",
+        description: "从零安装、节点测速、分流模式理解到 TUN 虚拟网卡全局代理手把手实操。",
+        clusters: [
+          { id: "quick-start", name: "新手 3 分钟极速配置与分流模式选择", url: "/clash/tutorial/quick-start/", kw: "Clash使用教程, Clash新手教程, 规则模式和全局模式" },
+          { id: "tun-mode", name: "TUN 虚拟网卡模式与全局接管全攻略", url: "/clash/tutorial/tun-mode/", kw: "Clash TUN模式, 虚拟网卡代理, 解决游戏软件不走代理" }
+        ]
+      },
+      {
+        id: "troubleshooting",
+        name: "Clash 故障排查",
+        url: "/clash/troubleshooting/",
+        description: "针对端口冲突、节点超时、系统代理失效、DNS 泄露及国内网页打不开的系统排查指南。",
+        clusters: [
+          { id: "crashes", name: "无法上网、核心崩溃与端口冲突诊断", url: "/clash/troubleshooting/crashes/", kw: "Clash故障排查, Clash连不上网, Clash端口占用解决" },
+          { id: "dns-leaks", name: "DNS 泄露与国内网站打不开深度修复", url: "/clash/troubleshooting/dns-leaks/", kw: "Clash国内网站打不开, DNS泄露修复, TUN模式无网" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "resources",
+    name: "资源与情报",
+    url: "/resources/",
+    description: "行业前沿情报站，提供跑路风险预警、免费节点巡检、高频 FAQ 解答与新手保姆级帮助。",
+    secondary: [
+      {
+        id: "free-nodes",
+        name: "免费节点",
+        url: "/resources/free-nodes/",
+        description: "公开网络节点可用性与延迟日常监测，科学指引节点自建与格式转换防护。",
+        clusters: [
+          { id: "pool", name: "每日公开节点池安全性与可用性巡检", url: "/resources/free-nodes/pool/", kw: "免费节点, 免费V2Ray节点, 每日可用免费节点" },
+          { id: "convert", name: "免费节点自建与安全转换全解析", url: "/resources/free-nodes/convert/", kw: "节点转换工具, 免费节点自建, 节点安全加密" }
+        ]
+      },
+      {
+        id: "risk-warning",
+        name: "跑路预警",
+        url: "/resources/risk-warning/",
+        description: "追踪机场服务器失联、客服长时失踪、超常骨折甩卖等高危跑路信号，守护用户充值安全。",
+        clusters: [
+          { id: "alerts", name: "机场运营异常与失联风险实时通报", url: "/resources/risk-warning/alerts/", kw: "跑路预警, 机场跑路名单, 机场失联通报" },
+          { id: "signals", name: "识别高危跑路机场的 8 大危险信号", url: "/resources/risk-warning/signals/", kw: "如何判断机场跑路, 机场安全预警, 避免年付被割韭菜" }
+        ]
+      },
+      {
+        id: "faq",
+        name: "机场 FAQ",
+        url: "/resources/faq/",
+        description: "汇总用户最常问的购买、配置、退款、支付方式、流媒体及 AI 解锁疑难解答。",
+        clusters: [
+          { id: "payment", name: "购买与支付常见避坑问答", url: "/resources/faq/payment/", kw: "机场FAQ, 机场支付方式, 机场退款政策" },
+          { id: "connectivity", name: "节点连不上与网络卡顿通用解决方案", url: "/resources/faq/connectivity/", kw: "节点连不上怎么办, 梯子卡顿解决, 翻墙常见问题" }
+        ]
+      },
+      {
+        id: "intelligence",
+        name: "机场风险情报",
+        url: "/resources/intelligence/",
+        description: "深度剖析国际专线租用成本、域名污染动态、实名支付链条与个人隐私隔离要领。",
+        clusters: [
+          { id: "industry", name: "行业动态与跨国专线成本监测", url: "/resources/intelligence/industry/", kw: "机场风险情报, 专线带宽成本, 跨境网络行业动态" },
+          { id: "privacy", name: "隐私与实名制支付风险防控", url: "/resources/intelligence/privacy/", kw: "微信支付宝买机场安全吗, 机场隐私保护, 虚拟币支付教程" }
+        ]
+      },
+      {
+        id: "node-check",
+        name: "节点检测",
+        url: "/resources/node-check/",
+        description: "原生 IP 属性、流媒体解锁权限、ChatGPT 访问资格与丢包率工具链深度教学。",
+        clusters: [
+          { id: "unlock", name: "流媒体与 ChatGPT 原生 IP 解锁检测指南", url: "/resources/node-check/unlock/", kw: "节点检测, 流媒体解锁检测, ChatGPT节点测试" },
+          { id: "methodology", name: "延迟与抖动测速方法学与工具链", url: "/resources/node-check/methodology/", kw: "测速工具推荐, 丢包率检测, 节点延迟测试方法" }
+        ]
+      },
+      {
+        id: "subscription-issues",
+        name: "订阅问题",
+        url: "/resources/subscription-issues/",
+        description: "订阅链接打不开、格式不兼容、节点更新失败与公共订阅转换泄露排查。",
+        clusters: [
+          { id: "network-error", name: "订阅链接打不开与 404/500 修复指南", url: "/resources/subscription-issues/network-error/", kw: "订阅问题, 订阅打不开, 订阅链接更新失败" },
+          { id: "converters", name: "订阅转换泄露节点风险与私有搭建", url: "/resources/subscription-issues/converters/", kw: "订阅转换安全吗, 在线订阅转换风险, 本地Subconverter" }
+        ]
+      },
+      {
+        id: "beginner",
+        name: "新手帮助",
+        url: "/resources/beginner/",
+        description: "专为初次接触翻墙与机场的新手小白打造，从 0 到 1 建立清晰概念与实操能力。",
+        clusters: [
+          { id: "zero-to-one", name: "第一次翻墙全流程小白保姆级指南", url: "/resources/beginner/zero-to-one/", kw: "新手帮助, 小白科学上网, 第一次买机场全流程" },
+          { id: "glossary", name: "常见报错与专业术语通俗速查词典", url: "/resources/beginner/glossary/", kw: "翻墙术语解释, 什么是节点什么是订阅, 翻墙报错速查" }
+        ]
+      }
+    ]
+  }
+];
+
+fs.writeFileSync("data/navigation.ts", `export interface Cluster {
+  id: string;
+  name: string;
+  url: string;
+  kw: string;
+}
+
+export interface SecondaryTopic {
+  id: string;
+  name: string;
+  url: string;
+  description: string;
+  clusters: Cluster[];
+}
+
+export interface PrimaryNav {
+  id: string;
+  name: string;
+  url: string;
+  description: string;
+  secondary: SecondaryTopic[];
+}
+
+export const navigation: PrimaryNav[] = ${JSON.stringify(navigation, null, 2)};
+export default navigation;
+`, "utf-8");
+
+console.log("Navigation data generated: 4 primary, 28 secondary, 56 tertiary clusters.");
+
+// Now generate the 448 planned articles (8 articles per cluster across 56 clusters)
+const plannedArticles = [];
+let artId = 1;
+
+navigation.forEach(primary => {
+  primary.secondary.forEach(sec => {
+    sec.clusters.forEach(cl => {
+      for (let i = 1; i <= 8; i++) {
+        const slug = `${sec.id}-${cl.id}-art-${i}`;
+        const url = `${cl.url}${slug}.html`;
+        const titleSuffix = [
+          "：2026 深度选型与权威实测指南",
+          "：核心原理、避坑要点与操作详解",
+          "：新手必看的完整解决方案与配置实操",
+          "：晚高峰网络表现与多维度横向对比",
+          "：技术细节剖析与全场景最佳实践",
+          "：常见错误诊断与即时排查修复手段",
+          "：从入门到精通的高阶使用技巧与防坑手册",
+          "：行业最新动态、数据审计与安全选购建议"
+        ][i - 1];
+
+        const title = `【${cl.name}】${titleSuffix}`;
+        const priority = i <= 2 ? "P0" : (i <= 5 ? "P1" : "P2");
+        const isPublished = (i === 1); // 1 representative article actually implemented per cluster
+
+        plannedArticles.push({
+          id: artId++,
+          primaryNav: primary.name,
+          primaryNavUrl: primary.url,
+          secondaryTopic: sec.name,
+          secondaryTopicUrl: sec.url,
+          clusterName: cl.name,
+          clusterUrl: cl.url,
+          title: title,
+          slug: slug,
+          url: url,
+          filePath: `docs${cl.url}${slug}.md`,
+          primaryKeyword: cl.kw.split(",")[0].trim(),
+          secondaryKeywords: cl.kw.split(",").slice(1).map(s => s.trim()),
+          searchIntent: i % 2 === 1 ? "Informational / Research" : "Commercial Investigation / Decision",
+          userPersona: i <= 4 ? "翻墙新手与日常办公娱乐用户" : "进阶玩家、开发者与外贸跨境从业者",
+          coreQuestion: `在 ${cl.name} 场景下，用户最核心关切的是什么？如何做出最优选择？`,
+          outline: [
+            "1. 核心结论与先验建议（Answer-First）",
+            "2. 基础概念与当前行业现状评估",
+            "3. 核心技术指标与多维度实测比对",
+            "4. 真实使用场景下的优缺点剖析与避坑要领",
+            "5. 代表性品牌方案实操演示与配置步骤",
+            "6. 常见故障 FAQ 深度解答",
+            "7. 数据来源、核验时间与商业声明"
+          ],
+          faqs: [
+            { q: `${cl.name} 的核心考量指标是什么？`, a: "稳定性、晚高峰吞吐、线路冗余度及合理的每 GB 计费成本。" },
+            { q: "初学者该如何避免踩坑？", a: "坚持月付优先、选择有自研客户端或清晰订阅说明的品牌、切勿轻信永久无限流量宣传。" }
+          ],
+          dataReference: "本站 2026 实测测速数据归档及官方最新资费核验表",
+          upstreamTopic: sec.name,
+          downstreamCta: "/brands/guangsu/",
+          priority: priority,
+          status: isPublished ? "published" : "planned"
+        });
+      }
+    });
+  });
+});
+
+fs.writeFileSync("data/articles_db.json", JSON.stringify(plannedArticles, null, 2), "utf-8");
+console.log(`Planned articles generated: ${plannedArticles.length} articles (${plannedArticles.filter(a => a.status === "published").length} representative published entries).`);

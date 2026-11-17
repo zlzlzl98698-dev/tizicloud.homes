@@ -1,0 +1,86 @@
+# 梯子云 (tizicloud.homes) - Apache 静态部署配置
+# 适用环境: Apache 2.4+ / HTTPS 生产服务器
+
+# 1. 安全控制：禁止目录列表浏览
+Options -Indexes -MultiViews
+
+# 2. 开启重写引擎
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 强制 HTTPS 访问 (生产环境生效)
+  RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP_HOST} !^localhost
+  RewriteCond %{HTTP_HOST} !^127\.0\.0\.1
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # 规范化：统一将 www 重定向至正式裸域名 (301)
+  RewriteCond %{HTTP_HOST} ^www\.tizicloud\.homes$ [NC]
+  RewriteRule ^(.*)$ https://tizicloud.homes/$1 [L,R=301]
+
+  # 规范化：移除末尾多余斜杠（非目录且有对应 html 文件时）
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} (.+)/$
+  RewriteRule ^ %1 [R=301,L]
+
+  # 干净 URL 路由：如果请求 /path 且对应 /path.html 存在，重写至 /path.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^(.+?)/?$ $1.html [L]
+
+  # 如果请求的是目录且存在 index.html，正常提供
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteCond %{REQUEST_FILENAME}/index.html -f
+  RewriteRule ^(.*)$ $1/index.html [L]
+</IfModule>
+
+# 3. 规范 404 错误页面响应（杜绝 SPA 错误 200 全局回退）
+ErrorDocument 404 /404.html
+
+# 4. 浏览器静态缓存策略
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 day"
+
+  # HTML 页面短缓存，便于内容即时更新
+  ExpiresByType text/html "access plus 0 seconds"
+
+  # CSS 和 JS 强缓存（Vite 构建自带 hash）
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/javascript "access plus 1 year"
+
+  # 图片与字体资源 30 天缓存
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/jpeg "access plus 30 days"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+  ExpiresByType image/x-icon "access plus 30 days"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+  # HTML 不缓存
+  <FilesMatch "\.(html|htm)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires 0
+  </FilesMatch>
+
+  # 静态资源强缓存
+  <FilesMatch "\.(js|css|woff2|woff)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # 安全响应头
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# 5. 字符集编码声明
+AddDefaultCharset UTF-8
+AddCharset UTF-8 .html .css .js .json .xml .txt .csv

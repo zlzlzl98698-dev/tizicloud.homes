@@ -1,0 +1,11 @@
+﻿SourcePage,TargetPage,AnchorText,LinkType,ContextNote
+"/","/airport/","2026 机场推荐与排行","Header / Hub","首页至机场核心专题入口"
+"/","/brands/guangsu/","光速云深度评测与专线实测","Commercial Featured","首屏主推品牌推荐卡片"
+"/","/clash/verge-download/","Clash Verge Rev 官方下载","Tool Entry","首页客户端导航直达"
+"/","/resources/risk-warning/","2026 机场跑路实时预警名单","Security Radar","首页安全防坑入口"
+"/airport/","/airport/recommend/","主力机场推荐精选","Topic Flow","专题首页下钻至二级栏目"
+"/airport/recommend/","/brands/guangsu/","光速云 IEPL 专线套餐评测","Brand Review","评测文章下钻品牌单页"
+"/brands/guangsu/","/clash/tutorial/","Clash 订阅导入光速云教程","Knowledge Link","品牌评测联动客户端教程"
+"/brands/guangsu/","/resources/node-check/","节点延迟与流媒体解锁检测","Testing Methodology","引用测速方法学"
+"/clash/verge/","/clash/verge-download/","最新官方安装包下载","Action Link","软件介绍至下载落地"
+"/resources/risk-warning/","/airport/stable/","挑选具备稳定运营历史的专线机场","Alternative Safe","避坑页引流安全稳定方案"

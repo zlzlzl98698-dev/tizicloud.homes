@@ -1,0 +1,17 @@
+{
+  "name": "tizicloud-homes",
+  "version": "1.0.0",
+  "private": true,
+  "description": "梯子云 - 中文机场推荐、VPN评测与科学上网知识库",
+  "scripts": {
+    "dev": "vitepress dev docs",
+    "build": "vitepress build docs && pagefind --site docs/.vitepress/dist --output-path docs/.vitepress/dist/pagefind",
+    "preview": "vitepress preview docs",
+    "build:vite": "vitepress build docs",
+    "search:index": "pagefind --site docs/.vitepress/dist --output-path docs/.vitepress/dist/pagefind"
+  },
+  "devDependencies": {
+    "pagefind": "^1.6.0",
+    "vitepress": "^1.6.4"
+  }
+}
